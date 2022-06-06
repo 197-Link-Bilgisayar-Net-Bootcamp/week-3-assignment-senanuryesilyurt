@@ -39,6 +39,10 @@ ADD CategoryId int FOREIGN KEY REFERENCES Categories(Id)
 ALTER TABLE Products 
 ADD FeatureId int FOREIGN KEY REFERENCES ProductFeatures(Id)
 ```
+Bu işlemleri gerçekleştirdiğimizde oluşan database diyagramı şu şekilde olacaktır.
+
+![Diyagram](https://github.com/197-Link-Bilgisayar-Net-Bootcamp/week-3-assignment-senanuryesilyurt/blob/master/photos/Diyagram.png)
+
 
 # DML (Data Manipulation Language) 
 - Veri işleme dili; database üzerine veri ekleme, veri güncelleme ve veri silme gibi işlemler için kullanılır.
