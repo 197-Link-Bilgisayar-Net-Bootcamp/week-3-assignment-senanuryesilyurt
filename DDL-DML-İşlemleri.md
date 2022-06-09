@@ -18,12 +18,6 @@ CREATE TABLE Categories(
 );
 ```
 ```
-CREATE TABLE ProductFeatures(
-  Id int IDENTITY(1,1) PRIMARY KEY,
-  Name nvarchar(100)
-);
-```
-```
 CREATE TABLE Products(
   Id int IDENTITY(1,1) PRIMARY KEY,
   Name nvarchar(75),
@@ -31,13 +25,19 @@ CREATE TABLE Products(
   Stock int
 );
 ```
-ALTER ADD anahtar sözcüğü ile Products-ProductFeatures ve Products-Categories tabloları arasındaki 1-1 ve 1-n ilişkileri Foreign Key yardımıyla kuralım.
+Product ile Product Features tabloları arasında 1-1 bir ilişki olduğundan dolayı Product Feature'ın Id değeri veritabanına eklenen product id'lerinden biri olmalıdır.
+Bu nedenle bu tabloyu oluşturuken Primary Key olan Id değeri aynı zamanda Foreign Key olarak tanımlanmalıdır.
+```
+CREATE TABLE ProductFeatures(
+  Id int PRIMARY KEY,
+  Name nvarchar(150)
+  CONSTRAINT FK_ProductFeatures_Id FOREIGN KEY (Id) REFERENCES Products(Id)
+)
+```
+ALTER ADD anahtar sözcüğü ile Products-Categories tabloları arasındaki 1-n ilişkisini Foreign Key yardımıyla kuralım.
 ```
 ALTER TABLE Products 
 ADD CategoryId int FOREIGN KEY REFERENCES Categories(Id)
-
-ALTER TABLE Products 
-ADD FeatureId int FOREIGN KEY REFERENCES ProductFeatures(Id)
 ```
 Bu işlemleri gerçekleştirdiğimizde oluşan database diyagramı şu şekilde olacaktır.
 
@@ -55,35 +55,39 @@ INSERT INTO Categories(Name) VALUES('Dekorasyon Ürünleri')
 INSERT INTO Categories(Name) VALUES('Teknolojik Ürünler')
 ```
 ```
-INSERT INTO ProductFeatures(Name) VALUES('No-Frost')
-INSERT INTO ProductFeatures(Name) VALUES('4 Programlı')
-INSERT INTO ProductFeatures(Name) VALUES('5 Raflı')
-INSERT INTO ProductFeatures(Name) VALUES('Seramik')
-INSERT INTO ProductFeatures(Name) VALUES('A Enerji Sınıfı')
-INSERT INTO ProductFeatures(Name) VALUES('Suya Dayanıklı')
-INSERT INTO ProductFeatures(Name) VALUES('Özel Toz Hazneli')
+INSERT INTO Products(CategoryId,Name,Price,Stock) 
+VALUES(1,'Çamasir Makinesi',6589,7)
+
+INSERT INTO Products(CategoryId,Name,Price,Stock) 
+VALUES(2,'Halka Vazo',69.90,25)
+
+INSERT INTO Products(CategoryId,Name,Price,Stock) 
+VALUES(1,'Buzdolabi',7800,3)
+
+INSERT INTO Products(CategoryId,Name,Price,Stock) 
+VALUES(3,'Akilli Saat',1.040,4)
+
+INSERT INTO Products(CategoryId,Name,Price,Stock) 
+VALUES(2,'Kitaplik',650,20)
+
+INSERT INTO Products(CategoryId,Name,Price,Stock) 
+VALUES(3,'Robot Süpürge',2.400,38)
+
+INSERT INTO Products(CategoryId,Name,Price,Stock) 
+VALUES(1,'Bulasık Makinesi',6.889,13)
+
+INSERT INTO Products(CategoryId,Name,Price,Stock) 
+VALUES(2,'Cerceve',45,100)
 ```
 ```
-INSERT INTO Products(CategoryId,FeatureId,Name,Price,Stock) 
-VALUES(1,5,'Çamasir Makinesi',6589,7)
-
-INSERT INTO Products(CategoryId,FeatureId,Name,Price,Stock) 
-VALUES(2,4,'Halka Vazo',69.90,25)
-
-INSERT INTO Products(CategoryId,FeatureId,Name,Price,Stock) 
-VALUES(1,1,'Buzdolabi',7800,3)
-
-INSERT INTO Products(CategoryId,FeatureId,Name,Price,Stock) 
-VALUES(3,6,'Akilli Saat',1.040,8)
-
-INSERT INTO Products(CategoryId,FeatureId,Name,Price,Stock) 
-VALUES(2,3,'Kitaplik',650,20)
-
-INSERT INTO Products(CategoryId,FeatureId,Name,Price,Stock) 
-VALUES(3,7,'Robot Süpürge',2.400,38)
-
-INSERT INTO Products(CategoryId,FeatureId,Name,Price,Stock) 
-VALUES(1,2,'Bulasık Makinesi',6.889,13)
+INSERT INTO ProductFeatures(Id,Name) VALUES(11,'No-Frost')
+INSERT INTO ProductFeatures(Id,Name) VALUES(7,'4 Programli')
+INSERT INTO ProductFeatures(Id,Name) VALUES(5,'5 Rafli')
+INSERT INTO ProductFeatures(Id,Name) VALUES(2,'Seramik')
+INSERT INTO ProductFeatures(Id,Name) VALUES(1,'A Enerji Sinifi')
+INSERT INTO ProductFeatures(Id,Name) VALUES(4,'Suya Dayanikli')
+INSERT INTO ProductFeatures(Id,Name) VALUES(6,'Özel Toz Hazneli')
+INSERT INTO ProductFeatures(Id,Name) VALUES(12,'Ahsap')
 ```
 SELECT anahtar sözcüğü ile oluşan tabloların son görüntüleri şu şekilde olacaktır.
 ```
@@ -92,30 +96,26 @@ SELECT * FROM Categories
 ![dbo.categories](https://github.com/197-Link-Bilgisayar-Net-Bootcamp/week-3-assignment-senanuryesilyurt/blob/master/photos/categories.png)
 
 ```
-SELECT * FROM ProductFeatures
-```
-![dbo.productFeatures](https://github.com/197-Link-Bilgisayar-Net-Bootcamp/week-3-assignment-senanuryesilyurt/blob/master/photos/productFeatures.png)
-
-```
 SELECT * FROM Products
 ```
 ![dbo.products](https://github.com/197-Link-Bilgisayar-Net-Bootcamp/week-3-assignment-senanuryesilyurt/blob/master/photos/products.png)
 
-Son olarak Products tablosundaki üç adet stoğu bulunan buzdolabı ürününün stoğunun bittiğini varsayarsak bu senaryoda DELETE keyword'ü ile bu ürünü silmemiz gerekir.
-Benzer bir şekilde adı 'Akilli Saat' olan üründen üç adet satıldığını düşünürsek stok bilgisinin 8'den 5'e düşmesi gerekmektedir. 
-DML ifadelerinden UPDATE anahtar sözcüğü ile de 2.senaryoyu gerçekleştirebiliriz.
-
 ```
-DELETE FROM Products WHERE Id=9
+SELECT * FROM ProductFeatures
+```
+![dbo.productFeatures](https://github.com/197-Link-Bilgisayar-Net-Bootcamp/week-3-assignment-senanuryesilyurt/blob/master/photos/productFeatures.png)
+
+
+Products tablosundaki beş adet stoğu bulunan akıllı saat ürününün stoğunun bittiğini varsayarsak bu senaryoda DELETE keyword'ü ile bu ürünü silmemiz gerekir. Fakat bu bu ürüne ait olan özelliği ProductFeatures tablosundan silmeden bu ürünü silmeye çalışırsak hata alırız. Bu nedenle ilk olarak ürüne ait özelliği ardından ürünü silerek bu işlemi gerçekleştirmeliyiz.
+```
+DELETE FROM ProductsFeatures WHERE Id=4
+DELETE FROM Products WHERE Id=4
 ```
 ![deletedProduct](https://github.com/197-Link-Bilgisayar-Net-Bootcamp/week-3-assignment-senanuryesilyurt/blob/master/photos/deletedProduct.png)
 
+İkinci bir senaryo olarak adı 'Kitaplik' olan üründen sekiz adet satıldığını düşünürsek stok bilgisinin 20'den 12'ye düşmesi gerekmektedir. DML ifadelerinden UPDATE anahtar sözcüğü ile de bu senaryoyu gerçekleyebiliriz. 
 ```
-UPDATE Products SET Stock=5 WHERE Id=4
+UPDATE Products SET Stock=12 WHERE Id=5
 ```
 ![updatedProduct](https://github.com/197-Link-Bilgisayar-Net-Bootcamp/week-3-assignment-senanuryesilyurt/blob/master/photos/updatedProduct.png)
-
-Ve Products tablosunun son hali görseldeki gibi olacaktır.
-
-![updatedProductsTable](https://github.com/197-Link-Bilgisayar-Net-Bootcamp/week-3-assignment-senanuryesilyurt/blob/master/photos/updatedProductsTable.png)
 
